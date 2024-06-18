@@ -1,15 +1,4 @@
-const options = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MDEzZTQ5ZjBkNmU3M2JlNTM5YWM5YjFiYzNmYWIxOSIsInN1YiI6IjY2NmFiNTRmNGUzOTM4NDU2YWVhNWY4OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2LCRgdp9OXVpyzvrrjB3z9uHIc7iPJlWxoa5jr9SQys'
-  }
-};
 
-fetch('https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=2&sort_by=popularity.desc', options)
-  .then(response => response.json())
-  .then(response => console.log(response))
-  .catch(err => console.error(err));
  const arrows = document.querySelectorAll(".arrow");
  const movieLists = document.querySelectorAll(".movie-list");
 // eventlisteners
@@ -35,6 +24,54 @@ arrows.forEach((arrow, i) => {
   });
  console.log(Math.floor(window.innerWidth / 270));
 });
+
+function addToCart(movieTitle) {
+  
+  let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+
+  console.log(cartItems)
+
+
+  const existingItem = cartItems.find(item => item.title === movieTitle);
+  if (existingItem) {
+      alert('This movie is already in your cart!');
+      return;
+  }
+  let movie = null;
+  for (let category of ['newrelease', 'horror', 'series', 'action', 'romance']) {
+      for (let item of document.getElementById(category).querySelectorAll('.movie-list-item')) {
+          if (item.querySelector('.movie-list-item-title').textContent === movieTitle) {
+              movie = {
+                  title: movieTitle,
+                  category: category
+              };
+              break;
+          }
+      }
+      if (movie) break;
+  }
+
+  
+  cartItems.push(movie);
+
+  
+  localStorage.setItem('cart', JSON.stringify(cartItems));
+
+  
+  alert('Movie added to cart!');
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  const addToCartButtons = document.querySelectorAll('.movie-list-item-button');
+  addToCartButtons.forEach(button => {
+      button.addEventListener('click', function () {
+          let movieTitle = this.parentNode.querySelector('.movie-list-item-title').textContent;
+          addToCart(movieTitle);
+      });
+  });
+});
+
 const ball = document.querySelector(".toggle-ball");
 const items = document.querySelectorAll(
   ".container,.movie-list-title,.navbar-container,.sidebar,.left-menu-icon,.toggle"
